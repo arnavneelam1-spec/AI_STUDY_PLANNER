@@ -1,24 +1,28 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import Navbar from "./components/Navbar";
+
+import Dashboard from "./pages/Dashboard";
+import Planner from "./pages/Planner";
+import Focus from "./pages/Focus";
+import Progress from "./pages/Progress";
+import Insights from "./pages/Insights";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Navbar />
+
+      <main style={{ padding: "30px" }}>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/planner" element={<Planner />} />
+          <Route path="/focus" element={<Focus />} />
+          <Route path="/progress" element={<Progress />} />
+          <Route path="/insights" element={<Insights />} />
+        </Routes>
+      </main>
+    </BrowserRouter>
   );
 }
 
