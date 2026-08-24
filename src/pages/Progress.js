@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 
-const DAYS = [
+// Keep this outside the component because it never changes.
+// This also prevents unnecessary useMemo recalculations.
+const days = [
   "Monday",
   "Tuesday",
   "Wednesday",
@@ -11,7 +13,8 @@ const DAYS = [
 ];
 
 function Progress() {
-  const [selectedDay, setSelectedDay] = useState("Monday");
+  const [selectedDay, setSelectedDay] =
+    useState("Monday");
 
   const [weeklyTasks, setWeeklyTasks] = useState({
     Monday: [
@@ -113,64 +116,110 @@ function Progress() {
     ],
   });
 
-  const selectedTasks = weeklyTasks[selectedDay] || [];
+  // =========================================================
+  // SELECTED DAY DATA
+  // =========================================================
 
-  const completedCount = selectedTasks.filter(
-    (task) => task.completed
-  ).length;
+  const selectedTasks =
+    weeklyTasks[selectedDay] || [];
 
-  const totalCount = selectedTasks.length;
+  const completedCount =
+    selectedTasks.filter(
+      (task) => task.completed
+    ).length;
+
+  const totalCount =
+    selectedTasks.length;
 
   const dailyProgress =
     totalCount === 0
       ? 0
-      : Math.round((completedCount / totalCount) * 100);
+      : Math.round(
+          (completedCount / totalCount) *
+            100
+        );
 
-  const totalWeeklyTasks = Object.values(weeklyTasks)
-    .flat()
-    .length;
+  // =========================================================
+  // WEEKLY DATA
+  // =========================================================
 
-  const completedWeeklyTasks = Object.values(weeklyTasks)
-    .flat()
-    .filter((task) => task.completed).length;
+  const totalWeeklyTasks =
+    Object.values(weeklyTasks)
+      .flat().length;
+
+  const completedWeeklyTasks =
+    Object.values(weeklyTasks)
+      .flat()
+      .filter(
+        (task) => task.completed
+      ).length;
 
   const weeklyProgress =
     totalWeeklyTasks === 0
       ? 0
       : Math.round(
-          (completedWeeklyTasks / totalWeeklyTasks) * 100
+          (completedWeeklyTasks /
+            totalWeeklyTasks) *
+            100
         );
 
-  const totalMinutes = selectedTasks.reduce(
-    (total, task) => total + task.minutes,
-    0
-  );
+  // =========================================================
+  // TIME DATA
+  // =========================================================
 
-  const completedMinutes = selectedTasks
-    .filter((task) => task.completed)
-    .reduce((total, task) => total + task.minutes, 0);
+  const totalMinutes =
+    selectedTasks.reduce(
+      (total, task) =>
+        total + task.minutes,
+      0
+    );
+
+  const completedMinutes =
+    selectedTasks
+      .filter(
+        (task) => task.completed
+      )
+      .reduce(
+        (total, task) =>
+          total + task.minutes,
+        0
+      );
+
+  // =========================================================
+  // TOGGLE TASK
+  // =========================================================
 
   const toggleTask = (taskId) => {
     setWeeklyTasks((current) => ({
       ...current,
-      [selectedDay]: (current[selectedDay] || []).map((task) =>
+
+      [selectedDay]: current[
+        selectedDay
+      ].map((task) =>
         task.id === taskId
           ? {
               ...task,
-              completed: !task.completed,
+              completed:
+                !task.completed,
             }
           : task
       ),
     }));
   };
 
-  const daySummary = useMemo(() => {
-    return DAYS.map((day) => {
-      const tasks = weeklyTasks[day] || [];
+  // =========================================================
+  // WEEKLY DAY SUMMARY
+  // =========================================================
 
-      const completed = tasks.filter(
-        (task) => task.completed
-      ).length;
+  const daySummary = useMemo(() => {
+    return days.map((day) => {
+      const tasks =
+        weeklyTasks[day] || [];
+
+      const completed =
+        tasks.filter(
+          (task) => task.completed
+        ).length;
 
       return {
         day,
@@ -179,10 +228,18 @@ function Progress() {
         progress:
           tasks.length === 0
             ? 0
-            : Math.round((completed / tasks.length) * 100),
+            : Math.round(
+                (completed /
+                  tasks.length) *
+                  100
+              ),
       };
     });
   }, [weeklyTasks]);
+
+  // =========================================================
+  // RETURN
+  // =========================================================
 
   return (
     <main
@@ -198,8 +255,15 @@ function Progress() {
           margin: "0 auto",
         }}
       >
-        {/* Header */}
-        <div style={{ marginBottom: "30px" }}>
+        {/* =================================================
+            HEADER
+        ================================================= */}
+
+        <div
+          style={{
+            marginBottom: "30px",
+          }}
+        >
           <p
             style={{
               margin: 0,
@@ -227,12 +291,16 @@ function Progress() {
               color: "#64748b",
             }}
           >
-            Select a day to view and complete your planned
-            study sessions.
+            Select a day to view and
+            complete your planned study
+            sessions.
           </p>
         </div>
 
-        {/* Weekly progress */}
+        {/* =================================================
+            WEEKLY PROGRESS
+        ================================================= */}
+
         <div
           style={{
             backgroundColor: "#ffffff",
@@ -277,7 +345,8 @@ function Progress() {
                 color: "#4f46e5",
               }}
             >
-              {completedWeeklyTasks}/{totalWeeklyTasks} tasks
+              {completedWeeklyTasks}/
+              {totalWeeklyTasks} tasks
             </span>
           </div>
 
@@ -295,13 +364,17 @@ function Progress() {
                 width: `${weeklyProgress}%`,
                 height: "100%",
                 backgroundColor: "#4f46e5",
-                transition: "width 0.3s ease",
+                transition:
+                  "width 0.3s ease",
               }}
             />
           </div>
         </div>
 
-        {/* Day selector */}
+        {/* =================================================
+            DAY SELECTOR
+        ================================================= */}
+
         <div
           style={{
             display: "grid",
@@ -312,22 +385,33 @@ function Progress() {
           }}
         >
           {daySummary.map((item) => {
-            const isSelected = item.day === selectedDay;
+            const isSelected =
+              item.day === selectedDay;
 
             return (
               <button
                 key={item.day}
-                onClick={() => setSelectedDay(item.day)}
+                onClick={() =>
+                  setSelectedDay(
+                    item.day
+                  )
+                }
                 style={{
                   border: isSelected
                     ? "2px solid #4f46e5"
                     : "1px solid #e2e8f0",
-                  backgroundColor: isSelected
-                    ? "#eef2ff"
-                    : "#ffffff",
+
+                  backgroundColor:
+                    isSelected
+                      ? "#eef2ff"
+                      : "#ffffff",
+
                   borderRadius: "14px",
+
                   padding: "14px",
+
                   cursor: "pointer",
+
                   textAlign: "left",
                 }}
               >
@@ -343,7 +427,8 @@ function Progress() {
 
                 <p
                   style={{
-                    margin: "5px 0 0 0",
+                    margin:
+                      "5px 0 0 0",
                     fontSize: "22px",
                     fontWeight: "800",
                     color: "#0f172a",
@@ -354,19 +439,24 @@ function Progress() {
 
                 <p
                   style={{
-                    margin: "4px 0 0 0",
+                    margin:
+                      "4px 0 0 0",
                     fontSize: "11px",
                     color: "#64748b",
                   }}
                 >
-                  {item.completed}/{item.total} done
+                  {item.completed}/
+                  {item.total} done
                 </p>
               </button>
             );
           })}
         </div>
 
-        {/* Selected day */}
+        {/* =================================================
+            SELECTED DAY
+        ================================================= */}
+
         <div
           style={{
             display: "grid",
@@ -375,7 +465,10 @@ function Progress() {
             gap: "20px",
           }}
         >
-          {/* Tasks */}
+          {/* =================================================
+              TASKS
+          ================================================= */}
+
           <div
             style={{
               backgroundColor: "#ffffff",
@@ -398,18 +491,21 @@ function Progress() {
 
             <h2
               style={{
-                margin: "5px 0 20px 0",
+                margin:
+                  "5px 0 20px 0",
                 color: "#0f172a",
               }}
             >
               {selectedDay}
             </h2>
 
-            {selectedTasks.length === 0 ? (
+            {selectedTasks.length ===
+            0 ? (
               <div
                 style={{
                   padding: "20px",
-                  backgroundColor: "#f8fafc",
+                  backgroundColor:
+                    "#f8fafc",
                   borderRadius: "12px",
                   textAlign: "center",
                   color: "#64748b",
@@ -418,85 +514,117 @@ function Progress() {
                 No study tasks planned.
               </div>
             ) : (
-              selectedTasks.map((task) => (
-                <button
-                  key={task.id}
-                  onClick={() => toggleTask(task.id)}
-                  style={{
-                    width: "100%",
-                    textAlign: "left",
-                    border: "1px solid #e2e8f0",
-                    backgroundColor: task.completed
-                      ? "#f0fdf4"
-                      : "#ffffff",
-                    borderRadius: "14px",
-                    padding: "16px",
-                    marginBottom: "10px",
-                    cursor: "pointer",
-                  }}
-                >
-                  <div
+              selectedTasks.map(
+                (task) => (
+                  <button
+                    key={task.id}
+                    onClick={() =>
+                      toggleTask(
+                        task.id
+                      )
+                    }
                     style={{
-                      display: "flex",
-                      gap: "12px",
-                      alignItems: "center",
+                      width: "100%",
+                      textAlign: "left",
+                      border:
+                        "1px solid #e2e8f0",
+
+                      backgroundColor:
+                        task.completed
+                          ? "#f0fdf4"
+                          : "#ffffff",
+
+                      borderRadius:
+                        "14px",
+
+                      padding: "16px",
+
+                      marginBottom:
+                        "10px",
+
+                      cursor: "pointer",
                     }}
                   >
-                    <span
-                      style={{
-                        fontSize: "21px",
-                      }}
-                    >
-                      {task.completed ? "✅" : "⬜"}
-                    </span>
-
                     <div
                       style={{
-                        flex: 1,
+                        display: "flex",
+                        gap: "12px",
+                        alignItems:
+                          "center",
                       }}
                     >
-                      <p
+                      <span
                         style={{
-                          margin: 0,
-                          fontWeight: "700",
-                          color: task.completed
-                            ? "#16a34a"
-                            : "#0f172a",
-                          textDecoration: task.completed
-                            ? "line-through"
-                            : "none",
+                          fontSize: "21px",
                         }}
                       >
-                        {task.title}
-                      </p>
+                        {task.completed
+                          ? "✅"
+                          : "⬜"}
+                      </span>
 
-                      <p
+                      <div
                         style={{
-                          margin: "5px 0 0",
-                          color: "#64748b",
-                          fontSize: "12px",
+                          flex: 1,
                         }}
                       >
-                        {task.subject}
-                      </p>
+                        <p
+                          style={{
+                            margin: 0,
+                            fontWeight:
+                              "700",
+
+                            color:
+                              task.completed
+                                ? "#16a34a"
+                                : "#0f172a",
+
+                            textDecoration:
+                              task.completed
+                                ? "line-through"
+                                : "none",
+                          }}
+                        >
+                          {task.title}
+                        </p>
+
+                        <p
+                          style={{
+                            margin:
+                              "5px 0 0",
+                            color:
+                              "#64748b",
+                            fontSize:
+                              "12px",
+                          }}
+                        >
+                          {task.subject}
+                        </p>
+                      </div>
+
+                      <span
+                        style={{
+                          fontWeight:
+                            "700",
+                          color:
+                            "#4f46e5",
+                          fontSize:
+                            "13px",
+                        }}
+                      >
+                        {task.minutes}m
+                      </span>
                     </div>
-
-                    <span
-                      style={{
-                        fontWeight: "700",
-                        color: "#4f46e5",
-                        fontSize: "13px",
-                      }}
-                    >
-                      {task.minutes}m
-                    </span>
-                  </div>
-                </button>
-              ))
+                  </button>
+                )
+              )
             )}
           </div>
 
-          {/* Daily stats */}
+          {/* =================================================
+              DAILY STATS
+          ================================================= */}
+
           <div
             style={{
               backgroundColor: "#ffffff",
@@ -519,7 +647,8 @@ function Progress() {
 
             <h2
               style={{
-                margin: "5px 0 25px 0",
+                margin:
+                  "5px 0 25px 0",
                 color: "#0f172a",
               }}
             >
@@ -532,11 +661,14 @@ function Progress() {
                 gap: "12px",
               }}
             >
+              {/* Tasks Completed */}
+
               <div
                 style={{
                   padding: "16px",
                   borderRadius: "12px",
-                  backgroundColor: "#eef2ff",
+                  backgroundColor:
+                    "#eef2ff",
                 }}
               >
                 <p
@@ -556,15 +688,19 @@ function Progress() {
                     color: "#312e81",
                   }}
                 >
-                  {completedCount}/{totalCount}
+                  {completedCount}/
+                  {totalCount}
                 </strong>
               </div>
+
+              {/* Study Minutes */}
 
               <div
                 style={{
                   padding: "16px",
                   borderRadius: "12px",
-                  backgroundColor: "#f0fdf4",
+                  backgroundColor:
+                    "#f0fdf4",
                 }}
               >
                 <p
@@ -584,15 +720,19 @@ function Progress() {
                     color: "#166534",
                   }}
                 >
-                  {completedMinutes}/{totalMinutes} min
+                  {completedMinutes}/
+                  {totalMinutes} min
                 </strong>
               </div>
+
+              {/* Daily Progress */}
 
               <div
                 style={{
                   padding: "16px",
                   borderRadius: "12px",
-                  backgroundColor: "#fff7ed",
+                  backgroundColor:
+                    "#fff7ed",
                 }}
               >
                 <p
@@ -617,11 +757,14 @@ function Progress() {
               </div>
             </div>
 
+            {/* Daily progress bar */}
+
             <div
               style={{
                 marginTop: "20px",
                 height: "12px",
-                backgroundColor: "#e2e8f0",
+                backgroundColor:
+                  "#e2e8f0",
                 borderRadius: "20px",
                 overflow: "hidden",
               }}
@@ -630,8 +773,10 @@ function Progress() {
                 style={{
                   height: "100%",
                   width: `${dailyProgress}%`,
-                  backgroundColor: "#22c55e",
-                  transition: "width 0.3s ease",
+                  backgroundColor:
+                    "#22c55e",
+                  transition:
+                    "width 0.3s ease",
                 }}
               />
             </div>
